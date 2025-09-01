@@ -1,0 +1,20 @@
+{
+  "name": "monaco-antlr-validation",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "antlr": "java -jar antlr-4.13.2-complete.jar -Dlanguage=TypeScript -visitor -o generated generated/Formula.g4"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.3",
+    "vite": "^7.1.2"
+  },
+  "dependencies": {
+    "antlr4": "^4.13.2",
+    "monaco-editor": "^0.52.2"
+  }
+}
