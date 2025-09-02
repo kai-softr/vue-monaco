@@ -1,4 +1,4 @@
-// Generated from generated/Formula.g4 by ANTLR 4.13.2
+// Generated from Formula.g4 by ANTLR 4.13.2
 // noinspection ES6UnusedImports,JSUnusedGlobalSymbols,JSUnusedLocalSymbols
 
 import {
