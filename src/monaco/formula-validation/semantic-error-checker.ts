@@ -6,10 +6,10 @@ import {
   FunctionNameContext,
 } from "../../../generated/FormulaParser.ts";
 import FormulaVisitor from "../../../generated/FormulaVisitor.ts";
-import { IFormulaError } from "../types.ts";
+import { IMonacoModalMarker } from "../types.ts";
 
 export class SemanticErrorChecker<Result> extends FormulaVisitor<Result> {
-  public errors: IFormulaError[] = [];
+  public errors: IMonacoModalMarker[] = [];
 
   public enterFieldRefExpr(ctx: FieldRefExprContext): void {
     const fieldName = ctx.getText();

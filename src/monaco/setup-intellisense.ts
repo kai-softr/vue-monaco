@@ -4,7 +4,9 @@ import { MonacGlobalScope } from "./types";
 export function setupIntelliSense(monaco: MonacGlobalScope) {
   monaco.languages.registerCompletionItemProvider("softr-formula", {
     provideCompletionItems: (_model, position, _context, _token) => {
+      console.warn(position);
       const range = monaco.Range.fromPositions(position);
+      console.warn(range);
       // TODO(Kai):
       // - Add field names here
       // - Adjust the kind property so the user can easily differentiate between functions, fields, literals, etc.
@@ -21,7 +23,7 @@ export function setupIntelliSense(monaco: MonacGlobalScope) {
           range,
         }));
 
-      return { suggestions: suggestions };
+      return { suggestions };
     },
   });
 }

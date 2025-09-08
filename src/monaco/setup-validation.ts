@@ -1,15 +1,15 @@
 import { CharStream, CommonTokenStream, ParseTreeWalker } from "antlr4";
 import {
-  IFormulaError,
-  MonacEditorMarker,
   MonacGlobalScope,
+  MonacoEditorMarker,
   MonacoStandaloneEditor,
 } from "./types.ts";
 
 import FormulaLexer from "../../generated/FormulaLexer.ts";
 import FormulaParser from "../../generated/FormulaParser.ts";
+import { LexerErrorListener } from "./formula-validation/lexer-error-listener.ts";
+import { ParserErrorListener } from "./formula-validation/parser-error-listener.ts";
 import { SemanticErrorChecker } from "./formula-validation/semantic-error-checker.ts";
-import { SyntaxErrorListener } from "./formula-validation/syntax-error-listener.ts";
 
 export function setupValidation(
   monaco: MonacGlobalScope,
@@ -18,7 +18,10 @@ export function setupValidation(
   let validationTimeout: number;
   editor.onDidChangeModelContent(() => {
     clearTimeout(validationTimeout);
-    validationTimeout = setTimeout(performValidation, 500);
+    validationTimeout = setTimeout(
+      () => performValidation(monaco, editor),
+      500
+    );
   });
 
   performValidation(monaco, editor);
@@ -29,16 +32,7 @@ function performValidation(
   editor: MonacoStandaloneEditor
 ) {
   const code = editor.getValue();
-  const errors = validateCode(code);
-
-  const markers: MonacEditorMarker[] = errors.map((error: IFormulaError) => ({
-    message: error.message,
-    severity: monaco.MarkerSeverity.Error,
-    startLineNumber: error.line,
-    startColumn: error.startColumn,
-    endLineNumber: error.line,
-    endColumn: error.endColumn,
-  }));
+  const markers = validateCode(code);
 
   const model = editor.getModel();
   if (model) {
@@ -46,18 +40,24 @@ function performValidation(
   }
 }
 
-function validateCode(code: string): IFormulaError[] {
+function validateCode(code: string): MonacoEditorMarker[] {
   const chars = new CharStream(code);
   const lexer = new FormulaLexer(chars);
   const tokenStream = new CommonTokenStream(lexer);
   const parser = new FormulaParser(tokenStream);
 
-  // Do syntax validation
-  const errorListener = new SyntaxErrorListener();
+  const lexerErrorListener = new LexerErrorListener();
+  lexer.removeErrorListeners();
+  lexer.addErrorListener(lexerErrorListener);
+
+  const parserErrorListener = new ParserErrorListener();
   parser.removeErrorListeners();
-  parser.addErrorListener(errorListener);
+  parser.addErrorListener(parserErrorListener);
+
   const tree = parser.formula();
-  const allErrors = errorListener.getErrors();
+  const allErrors = lexerErrorListener.getErrors().length
+    ? lexerErrorListener.getErrors()
+    : parserErrorListener.getErrors();
 
   // Do semantic validation if syntax is correct
   if (allErrors.length === 0) {

@@ -23,7 +23,7 @@ setupSyntaxColoring(monaco);
 // --- Editor Setup ---
 const editorContainer = document.getElementById("editor-container")!;
 const editor = monaco.editor.create(editorContainer, {
-  value: `SUM({field1}) + 3 + "asdasd"`,
+  value: `FLOOR({Duration_ms}/60000) & “:” & RIGHT(“0” & MOD(ROUND({Duration_ms}/1000, 0), 60), 2)`,
   language: "softr-formula",
   theme: "formulaTheme",
   automaticLayout: true,

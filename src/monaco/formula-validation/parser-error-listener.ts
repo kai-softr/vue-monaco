@@ -1,29 +1,32 @@
 import { ErrorListener, RecognitionException, Recognizer, Token } from "antlr4";
-import { IFormulaError } from "../types";
+import { MarkerSeverity } from "monaco-editor";
+import { MonacoEditorMarker } from "../types";
 
-export class SyntaxErrorListener<
+export class ParserErrorListener<
   TSymbol extends Token
 > extends ErrorListener<TSymbol> {
-  private errors: IFormulaError[] = [];
+  private errors: MonacoEditorMarker[] = [];
 
   syntaxError(
     _recognizer: Recognizer<TSymbol>,
     offendingSymbol: TSymbol,
     line: number,
     column: number,
-    msg: string,
+    message: string,
     _e: RecognitionException | undefined
   ): void {
     this.errors.push({
-      line: line,
+      message,
+      severity: MarkerSeverity.Error,
+      startLineNumber: line,
       startColumn: column + 1,
+      endLineNumber: line,
       endColumn:
         column + 1 + (offendingSymbol ? offendingSymbol.text.length : 1),
-      message: msg,
     });
   }
 
-  getErrors(): IFormulaError[] {
+  getErrors(): MonacoEditorMarker[] {
     return this.errors;
   }
 }
